@@ -1,5 +1,6 @@
 #define SPI_DISPLAY
 #define SH1106_DISPLAY
+#define DHT22
 //#define NO_AUTO_SWAP
 //#define DEBUG
 #ifdef DEBUG
