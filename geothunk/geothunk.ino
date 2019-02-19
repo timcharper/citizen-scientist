@@ -11,6 +11,8 @@
 #define NO_AUTO_SWAP
 #endif
 
+#define NO_SERVO
+
 #include <FS.h>
 #include <ESP8266WiFi.h>
 #include <DNSServer.h>
@@ -53,6 +55,7 @@ SimpleDHT11 dht(pinDHT);
 #define DEFAULT_MDNS_NAME "geothunk"
 #define TRIGGER_PIN 0
 #define LED_PIN D4
+#define LED2_PIN D0
 #define PULSE_PIN D8
 
 bool shouldSaveConfig = false;
@@ -278,7 +281,14 @@ void setup() {
   pinMode(PULSE_PIN, OUTPUT);
   tone(PULSE_PIN, 40);
   WiFi.printDiag(Serial);
+#ifndef NO_SERVO
   myservo.attach(D0);
+#else
+  // Servo and LED2 are controlled by the same pin
+  // If no servo, then set LED to off
+  pinMode(LED2_PIN, OUTPUT);
+  digitalWrite(LED2_PIN, HIGH);
+#endif
 
   display.init();
 #ifndef SPI_DISPLAY
@@ -521,7 +531,9 @@ void loop() {
 
     measureDHT();
 
+#ifndef NO_SERVO
     myservo.write(map(pmsSensor.pm2_5, 0, 30, 180, 0));
+#endif
 
     if (!tcpClient->connected() && atoi(gps_port) > 0) tcpClient->connect(WiFi.gatewayIP(), atoi(gps_port));
 
